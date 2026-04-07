@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎬 Cinema do GGTralha</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 🎨 PALETA SONIC */
+:root {
+    --azul: #0a75ff;
+    --azul-escuro: #003c8f;
+    --amarelo: #ffcc00;
+    --verde: #2ecc71;
+    --vermelho: #e74c3c;
+}
+
+/* 🌴 FUNDO GREEN HILL */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: 
+        linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+        url("https://i.redd.it/green-hill-zone-from-sth1-but-its-minecraft-v0-elsduldgw7791.png?width=1163&format=png&auto=webp&s=86c0152ebc2c19395eedfbd9178bab75d6c91fe1"); /* Green Hill */
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    padding: 30px;
+}
+
+/* 🎬 CARD */
+.card {
+    max-width: 900px;
+    margin: auto;
+    background: rgba(255,255,255,0.95);
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+/* 🔵 HEADER */
+.header {
+    background: var(--azul);
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.header h1 {
+    font-size: 2rem;
+}
+
+/* 🎥 TELA */
+.tela {
+    text-align: center;
+    background: #111;
+    color: var(--amarelo);
+    padding: 10px;
+    letter-spacing: 5px;
+}
+
+/* 💺 ASSENTOS */
+.mapa {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 10px;
+}
+
+.linha {
+    display: flex;
+    gap: 10px;
+}
+
+.assento {
+    width: 65px;
+    height: 65px;
+    background: #ddd;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: bold;
+}
+
+.assento:hover {
+    transform: scale(1.08);
+}
+
+.assento.selecionado {
+    background: var(--verde);
+    color: white;
+}
+
+.assento.ocupado {
+    background: var(--vermelho);
+    color: white;
+    cursor: not-allowed;
+}
+
+/* 🎮 BOTÕES */
+.painel {
+    text-align: center;
+    padding: 20px;
+}
+
+button {
+    background: var(--amarelo);
+    border: none;
+    padding: 12px 25px;
+    margin: 5px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #ffaa00;
+}
+
+/* 📊 TEXTO */
+#resumo {
+    margin-bottom: 10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="header">
+<h1>🎬 Cinema do GGTralha</h1>
+<p>Filme: Sonic 3</p>
+</div>
+
+<div class="tela">TELA</div>
+
+<div class="mapa" id="mapa"></div>
+
+<div class="painel">
+<p id="resumo">Nenhum assento selecionado</p>
+<button onclick="reservar()">Reservar</button>
+<button onclick="limpar()">Limpar</button>
+</div>
+
+</div>
+
+<script>
+const som = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.wav");
+
+let assentos = [
+["livre","ocupado","livre","livre"],
+["livre","livre","livre","livre"],
+["livre","livre","livre","ocupado"]
+];
+
+function tocar(){
+    som.currentTime = 0;
+    som.play();
+}
+
+function render(){
+const mapa = document.getElementById("mapa");
+mapa.innerHTML = "";
+
+for(let i=0;i<3;i++){
+let linha = document.createElement("div");
+linha.className="linha";
+
+for(let j=0;j<4;j++){
+let a = document.createElement("div");
+a.className="assento";
+
+if(assentos[i][j]=="ocupado") a.classList.add("ocupado");
+if(assentos[i][j]=="selecionado") a.classList.add("selecionado");
+
+a.innerText = i*4+j+1;
+
+a.onclick=()=>{
+if(assentos[i][j]=="ocupado") return;
+
+tocar();
+
+assentos[i][j] =
+assentos[i][j]=="selecionado"?"livre":"selecionado";
+
+render();
+atualizar();
+};
+
+linha.appendChild(a);
+}
+mapa.appendChild(linha);
+}
+}
+
+function atualizar(){
+let lista=[];
+for(let i=0;i<3;i++){
+for(let j=0;j<4;j++){
+if(assentos[i][j]=="selecionado"){
+lista.push(`${String.fromCharCode(65+i)}${j+1}`);
+}
+}
+}
+
+document.getElementById("resumo").innerText =
+lista.length ? "Selecionados: "+lista.join(", ") : "Nenhum assento selecionado";
+}
+
+function reservar(){
+tocar();
+for(let i=0;i<3;i++){
+for(let j=0;j<4;j++){
+if(assentos[i][j]=="selecionado"){
+assentos[i][j]="ocupado";
+}
+}
+}
+render();
+atualizar();
+}
+
+function limpar(){
+tocar();
+for(let i=0;i<3;i++){
+for(let j=0;j<4;j++){
+if(assentos[i][j]=="selecionado"){
+assentos[i][j]="livre";
+}
+}
+}
+render();
+atualizar();
+}
+
+render();
+atualizar();
+</script>
+
+</body>
+</html>
